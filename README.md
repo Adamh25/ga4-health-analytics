@@ -32,6 +32,10 @@ Looker Studio Dashboard
   ├── CME funnel (start → complete)
   └── Traffic source breakdown
 ```
+---
+
+## Dashboard Preview
+![Dashboard Overview](looker_studio/dashboard_overview.png)
 
 ---
 
