@@ -8,7 +8,6 @@
 --                scroll_depth_75_rate, pdf_downloads
 --
 -- Content category is inferred from the page path prefix.
--- In production this would come from a content taxonomy dimension table.
 -- ============================================================
 
 WITH page_events AS (
