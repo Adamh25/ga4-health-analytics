@@ -9,9 +9,6 @@
 --   Stage 1: content_view        (page_view on a CME path)
 --   Stage 2: cme_module_start    (add_to_cart in sample data)
 --   Stage 3: cme_module_complete (purchase in sample data)
---
--- In a real GA4 property, fire these as custom events from your
--- platform and replace the event_name values below accordingly.
 -- ============================================================
 
 WITH session_funnel AS (
