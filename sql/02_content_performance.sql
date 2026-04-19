@@ -1,12 +1,3 @@
--- ============================================================
--- 02_content_performance.sql
--- Top content pages ranked by engaged sessions and scroll depth
---
--- Source: GA4 BigQuery native export (events_* partitioned tables)
--- Output fields: page_path, content_category, page_views,
---                unique_sessions, engaged_sessions, avg_time_on_page_sec,
---                scroll_depth_75_rate, pdf_downloads
---
 -- Content category is inferred from the page path prefix.
 -- ============================================================
 
@@ -25,27 +16,25 @@ WITH page_events AS (
      FROM UNNEST(event_params)
      WHERE key = 'engagement_time_msec')                      AS engagement_time_msec,
 
-    -- Normalise page path: strip query string and trailing slash
     REGEXP_REPLACE(
       REGEXP_REPLACE(
         (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'page_location'),
-        r'\?.*$', ''   -- remove query string
+        r'\?.*$', ''   
       ),
-      r'/$', ''        -- remove trailing slash
+      r'/$', ''       
     )                                                          AS page_path
 
   FROM `bigquery-public-data.ga4_obfuscated_sample_ecommerce.events_*`
   WHERE _TABLE_SUFFIX BETWEEN '20201101' AND '20210131'
     AND event_name IN (
       'page_view',
-      'scroll',         -- maps to scroll_depth_75 in health platform
+      'scroll',         -- maps to scroll_depth_75 
       'begin_checkout', -- maps to pdf_download
       'user_engagement'
     )
 
 ),
 
--- Session-level aggregation per page
 page_sessions AS (
 
   SELECT
@@ -55,8 +44,7 @@ page_sessions AS (
     COUNTIF(event_name = 'page_view')                          AS page_views,
     SUM(engagement_time_msec)                                  AS session_page_eng_ms,
 
-    -- GA4 'scroll' event fires at 90% scroll depth by default;
-    -- in a health platform, configure a custom 'scroll_depth_75' event
+    -- GA4 scroll event fires at 90% scroll depth by default;
     MAX(CASE WHEN event_name = 'scroll' THEN 1 ELSE 0 END)    AS reached_scroll_depth,
     MAX(CASE WHEN event_name = 'begin_checkout' THEN 1 ELSE 0 END) AS pdf_downloaded
 
@@ -67,7 +55,6 @@ page_sessions AS (
 
 ),
 
--- Page-level summary
 page_summary AS (
 
   SELECT
