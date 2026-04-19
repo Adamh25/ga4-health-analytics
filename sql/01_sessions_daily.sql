@@ -1,10 +1,6 @@
--- ============================================================
--- 01_sessions_daily.sql
--- Daily session volume, engagement time, and engaged session rate
---
--- Source: GA4 BigQuery native export (events_* partitioned tables)
--- Output fields: date, sessions, engaged_sessions, engagement_rate,
---                avg_engagement_seconds, pdf_downloads, cme_completions
+
+-- Output fields: date, sessions, engaged_sessions, engagement_rate, 
+--            avg_engagement_seconds, pdf_downloads, cme_completions
 -- ============================================================
 
 WITH raw_events AS (
@@ -14,31 +10,25 @@ WITH raw_events AS (
     user_pseudo_id,
     event_name,
 
-    -- Extract session ID from nested event_params
     (SELECT value.int_value
      FROM UNNEST(event_params)
      WHERE key = 'ga_session_id')                            AS session_id,
 
-    -- Extract engagement time (milliseconds) for this event
     (SELECT value.int_value
      FROM UNNEST(event_params)
      WHERE key = 'engagement_time_msec')                     AS engagement_time_msec,
 
-    -- Extract page path for content-level filtering
     (SELECT value.string_value
      FROM UNNEST(event_params)
      WHERE key = 'page_location')                            AS page_location
 
   FROM `bigquery-public-data.ga4_obfuscated_sample_ecommerce.events_*`
 
-  -- Restrict to date range; swap these values for your own window
   WHERE _TABLE_SUFFIX BETWEEN '20201101' AND '20210131'
 
 ),
 
 -- Aggregate engagement time to session level using window function
--- GA4 splits engagement_time_msec across multiple events per session;
--- summing at session level gives total engaged time
 session_engagement AS (
 
   SELECT
@@ -50,7 +40,6 @@ session_engagement AS (
     SUM(engagement_time_msec)                                AS session_eng_ms,
 
     -- Flag CME-relevant events (remapped from ecommerce equivalents)
-    -- In a real health platform: replace with actual GA4 custom event names
     COUNTIF(event_name = 'purchase')                         AS cme_completions,    -- maps to cme_module_complete
     COUNTIF(event_name = 'add_to_cart')                      AS cme_starts,         -- maps to cme_module_start
     COUNTIF(event_name = 'begin_checkout')                   AS pdf_downloads       -- maps to pdf_download
