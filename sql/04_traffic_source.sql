@@ -1,22 +1,12 @@
--- ============================================================
--- 04_traffic_source.sql
--- Session volume and engagement quality by traffic source / medium
---
--- Source: GA4 BigQuery native export (events_* partitioned tables)
 -- Output fields: source, medium, channel_group, sessions,
 --                engaged_sessions, engagement_rate_pct,
 --                avg_engagement_seconds, cme_completions,
 --                cme_completion_rate_pct
---
--- GA4 traffic source fields are set at session level on the
--- session_start event. This query extracts them from that event
--- and propagates to all events in the session.
--- ============================================================
 
 WITH session_source AS (
 
   -- Pull traffic attribution from the session_start event only
-  -- GA4 attributes source/medium at session level, not per-event
+  -- GA4 attributes source/medium at session level
   SELECT
     (SELECT value.int_value
      FROM UNNEST(event_params)
@@ -37,7 +27,7 @@ WITH session_source AS (
 
 ),
 
--- Pull engagement and conversion metrics for all events
+-- Pulls engagement and conversion metrics for all events
 session_metrics AS (
 
   SELECT
@@ -116,7 +106,7 @@ SELECT
 FROM joined
 GROUP BY 1, 2, 3
 
--- Focus on meaningful traffic sources
+-- Focuses on meaningful traffic sources, adjustable
 HAVING COUNT(DISTINCT session_id) >= 20
 
 ORDER BY sessions DESC;
