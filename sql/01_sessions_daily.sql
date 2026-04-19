@@ -1,4 +1,3 @@
-
 -- Output fields: date, sessions, engaged_sessions, engagement_rate, 
 --            avg_engagement_seconds, pdf_downloads, cme_completions
 -- ============================================================
