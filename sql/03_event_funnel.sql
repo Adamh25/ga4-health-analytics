@@ -1,7 +1,4 @@
--- Source: GA4 BigQuery native export (events_* partitioned tables)
--- Output fields: funnel_stage, users, sessions, drop_off_pct, completion_rate_pct
---
--- Funnel stages (remapped from GA4 ecommerce sample events):
+-- Funnel stages remapped from GA4 ecommerce sample events:
 --   Stage 1: content_view        (page_view on a CME path)
 --   Stage 2: cme_module_start    (add_to_cart in sample data)
 --   Stage 3: cme_module_complete (purchase in sample data)
