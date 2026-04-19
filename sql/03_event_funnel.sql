@@ -1,7 +1,3 @@
--- ============================================================
--- 03_event_funnel.sql
--- CME module engagement funnel: content view → module start → module complete
---
 -- Source: GA4 BigQuery native export (events_* partitioned tables)
 -- Output fields: funnel_stage, users, sessions, drop_off_pct, completion_rate_pct
 --
